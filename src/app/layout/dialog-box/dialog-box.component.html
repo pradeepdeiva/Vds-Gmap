@@ -1,0 +1,52 @@
+<mat-dialog-content class="mat-typography">
+  <div class="grid row">
+    <div class="col-1" style="width: auto;height: fit-content;margin-left:30px;margin-right: 15px;">
+      <mat-form-field appearance="outline">
+        <mat-label>Depature Time</mat-label>
+        <input matInput [ngxMatDatetimePicker]="picker" placeholder="Choose a date & time"
+          [formControl]="datatimepicker">
+        <mat-datepicker-toggle matSuffix [for]="$any(picker)"></mat-datepicker-toggle>
+        <ngx-mat-datetime-picker #picker></ngx-mat-datetime-picker>
+      </mat-form-field>
+    </div>
+    <div class="col-1 arg2">
+      <section class="example-section" [formGroup]="toppings" style="width: fit-content;">
+        <p><mat-checkbox formControlName="avoidtolls">Avoid Tolls</mat-checkbox>
+        </p>
+        <p><mat-checkbox formControlName="avoidhighways">Avoid Highways</mat-checkbox></p>
+        <p><mat-checkbox formControlName="combinedorder">Combined Order</mat-checkbox></p>
+      </section>
+    </div>
+    <div class="col-10 row" *ngIf="toppings.value.combinedorder">
+      <div class="col-4" style="margin-left: 20px;">
+        <mat-form-field appearance="outline">
+          <mat-label>Location</mat-label>
+          <input matInput [(ngModel)]="location" name="location" placeholder="Location">
+          <!-- <div class="example-button"> -->
+          <button mat-flat-button matTooltip="Primary" color="primary" aria-label="Example mini fab with a heart icon"
+            matSuffix style="height: 54px;" (click)="addLocation()">
+            <mat-icon style="margin: 0;">double_arrow</mat-icon>
+          </button>
+          <!-- </div> -->
+        </mat-form-field>
+      </div>
+      <div class="col-7" style="height: 173px;margin-left: 20px;width: 45%;">
+        <div cdkDropList class="example-list" (cdkDropListDropped)="drop($event)"
+          style="border-style: solid;border-color: black;padding: 10px;overflow: scroll;height: 173px;width: 100%;">
+          <div class="example-box" *ngFor="let way of waypoints" cdkDrag>
+            <div class="example-custom-placeholder" *cdkDragPlaceholder></div>
+            {{way.location}}
+          </div>
+        </div>
+      </div>
+      <button mat-fab matTooltip="Basic" color="basic" aria-label="Example icon-button with a heart icon"
+        (click)="removeAll()">
+        <mat-icon>cancel</mat-icon>
+      </button>
+    </div>
+  </div>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button [mat-dialog-close]="data">Cancel</button>
+  <button mat-button mat-dialog-close cdkFocusInitial (click)="onNoClick()">Confirm</button>
+</mat-dialog-actions>

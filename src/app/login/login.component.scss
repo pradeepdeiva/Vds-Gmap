@@ -1,0 +1,68 @@
+#login-column {
+    margin-top: 80px;
+    margin-bottom: 80px;
+}
+
+main {
+    margin: 0;
+    padding: 0;
+    background-color: #eee;
+    height: 85vh;
+}
+
+.form-signin {
+    max-width: 450px;
+    padding: 15px 35px 45px;
+    margin: 0 auto;
+    background-color: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+
+    .form-signin-heading {
+        margin-bottom: 30px;
+    }
+
+    input[type="text"] {
+        margin-bottom: -1px;
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+
+    input[type="password"] {
+        margin-bottom: 20px;
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+
+}
+
+mat-form-field {
+    width: 80%;
+    height: 90px;
+    flex: auto;
+
+    // .mat-mdc-text-field-wrapper:not(.mdc-text-field--outlined) .mat-mdc-form-field-infix
+}
+
+::ng-deep .mat-mdc-text-field-wrapper:not(.mdc-text-field--outlined) .mat-mdc-form-field-infix {
+    padding-top: 33px;
+    padding-bottom: 15px;
+    font-size: 18px;
+}
+
+.form-group {
+    margin-bottom: 10px;
+}
+
+.error-msg {
+    text-align: center;
+    color: whitesmoke;
+    font-size: 20px;
+    background-color: rgba(240, 128, 128);
+    margin: 0 auto;
+    max-width: 450px;
+    height: 45px;
+}
+
+.ng-tns-c5-0, .ng-tns-c5-1 {
+    font-size: 15px;
+}

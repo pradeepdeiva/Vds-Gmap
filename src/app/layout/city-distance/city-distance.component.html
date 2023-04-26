@@ -1,0 +1,52 @@
+<div class="container" class="contat">
+    <div class="grid">
+        <div class="mat-elevation-z8">
+            <!-- <div class="spinner-container" *ngIf="dataSource.loading$ | async">
+      <mat-spinner></mat-spinner>
+  </div> -->
+            <table mat-table [dataSource]="details" class="mat-elevation-z8 demo-table">
+
+                <!-- Position Column -->
+                <ng-container matColumnDef="source">
+                    <th mat-header-cell *matHeaderCellDef> Source </th>
+                    <td mat-cell *matCellDef="let element"> {{element.source}} </td>
+                </ng-container>
+
+                <!-- Name Column -->
+                <ng-container matColumnDef="destination">
+                    <th mat-header-cell *matHeaderCellDef> Destination </th>
+                    <td mat-cell *matCellDef="let element"> {{element.destination}} </td>
+                </ng-container>
+
+                <!-- Weight Column -->
+                <ng-container matColumnDef="distance">
+                    <th mat-header-cell *matHeaderCellDef> Distance </th>
+                    <td mat-cell *matCellDef="let element"> {{element.distance}} </td>
+                </ng-container>
+
+                <!-- Symbol Column -->
+                <ng-container matColumnDef="duration">
+                    <th mat-header-cell *matHeaderCellDef> Duration </th>
+                    <td mat-cell *matCellDef="let element"> {{element.duration}} </td>
+                </ng-container>
+
+                <!-- <ng-container matColumnDef="orginActualAddress">
+                    <th mat-header-cell *matHeaderCellDef> Orgin Address </th>
+                    <td mat-cell *matCellDef="let element"> {{element.orginActualAddress}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="destinationActualAddress">
+                    <th mat-header-cell *matHeaderCellDef> Destination Address </th>
+                    <td mat-cell *matCellDef="let element"> {{element.destinationActualAddress}} </td>
+                </ng-container> -->
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="onRowClick(row)"></tr>
+            </table>
+
+            <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons
+                aria-label="Select page of periodic elements">
+            </mat-paginator>
+        </div>
+    </div>
+</div>

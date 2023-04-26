@@ -1,0 +1,65 @@
+<mat-dialog-content class="mat-typography">
+    <div class="card" style="margin: 34px;">
+        <div class="card-container purple-container overflow-hidden">
+            <div class="grid">
+                <div class="col-8" style="display: flex;justify-content: center;">
+                    <google-map height="400px" width="850px" [center]="center" [zoom]="zoom"
+                        (mapClick)="addMarker($event)" [disableDefaultUI]="false" [showDirection]="this.displayDirections">
+
+                        <map-marker *ngFor="let markerPosition of markerPositions" [options]="markerOptions"
+                            [position]="markerPosition"></map-marker>
+
+                        <map-directions-renderer [options]="directionsRenderOption"
+                            *ngIf="(directionsResults$ | async) as directionsResults" [directions]="directionsResults"
+                            (directionsChanged)="setDirectionsOnDrag($event)"></map-directions-renderer>
+
+                    </google-map>
+                </div>
+                <div class="col-4">
+                    <div class="grid arg">
+                        <mat-form-field appearance="outline">
+                            <mat-label>Source</mat-label>
+                            <input matInput #input placeholder="Source" [disabled]="editmode" [(ngModel)]="editsource"
+                                name="editsource">
+                        </mat-form-field>
+                        <mat-form-field appearance="outline">
+                            <mat-label>Destination</mat-label>
+                            <input matInput #input placeholder="Destination" [disabled]="editmode"
+                                [(ngModel)]="editdestination" name="editdestination">
+                        </mat-form-field>
+
+                        <button mat-flat-button color="primary" *ngIf="!editmode;else show"
+                            [disabled]="!(this.editsource.length>0&&this.editdestination.length>0)"
+                            (click)="showDistance()">Calculate</button>
+                        <button mat-flat-button color="primary" *ngIf="!editmode" (click)="changeMode()">Cancel</button>
+                        <ng-template #show><button mat-raised-button color="accent"
+                                (click)="changeMode()">Edit</button></ng-template>
+                    </div>
+
+                    <div class="grid row" style="margin-top: 17px;" *ngIf="editmode;else display">
+                        <h3>Source: {{this.data.source}}</h3>
+                        <h3>Desination: {{this.data.destination}}</h3>
+                        <h3>TravelMode: "{{this.data.travelMode}}"</h3>
+                        <h3>Distance: {{this.data.distance}}</h3>
+                        <h3>Duration: {{this.data.duration}}</h3>
+                    </div>
+
+                    <ng-template #display>
+                        <div class="grid row" *ngIf="(this.viewdetails | json) != '{}'" style="margin-top: 17px;">
+                            <h3>Source: {{this.viewdetails.source}}</h3>
+                            <h3>Desination: {{this.viewdetails.destination}}</h3>
+                            <h3>TravelMode: "{{this.viewdetails.travelMode}}"</h3>
+                            <h3>Distance: {{this.viewdetails.distance}}</h3>
+                            <h3>Duration: {{this.viewdetails.duration}}</h3>
+                        </div>
+                    </ng-template>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+    <button mat-raised-button [mat-dialog-close]="data">Cancel</button>
+    <button mat-raised-button mat-dialog-close cdkFocusInitial (click)="saveCofirmList()" [disabled]="(this.viewdetails | json) === '{}'" *ngIf="!editmode" color="primary">Update</button>
+</mat-dialog-actions>

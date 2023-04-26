@@ -1,0 +1,45 @@
+.nav-container {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+  }
+  .menu-button {
+    background: #e7e9eb;
+    color: #000000;
+    border: none;
+  }
+  .menu-button:enabled:hover,
+  .menu-button:enabled:active {
+    background: #e7e9eb;
+    color: #000000;
+    border: none;
+  }
+  .mat-drawer-content{
+    overflow-x: inherit;
+  }
+
+  .header{
+    background-color: #3f51b5;
+  }
+
+  .heading-name{
+    display: block;
+    margin: auto 0;
+    width: fit-content;
+  }
+
+  .arg1{
+    display: inline-block;
+    margin: auto 0;
+    width: fit-content;
+  }
+
+  .arg2{
+    margin: auto 50px;
+  }
+
+  .arg4{
+    max-width: fit-content;
+  }

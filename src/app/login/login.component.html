@@ -1,0 +1,38 @@
+<main role="main" style="min-height: 100vh;">
+    <div class="container">
+        <div class="row justify-content-center align-items-center">
+            <div class="col-md-6" id="login-column">
+                <h4 *ngIf="errorMsg.length>0" class="error-msg"><span
+                        style="display: inline-block;margin: 10px 0px;">{{errorMsg}}</span></h4>
+                <div class="col-md-12" id="login-box">
+                    <form id="login-form" [formGroup]="loginForm" class="form form-signin">
+                        <h2 class="form-signin-heading text-center" style="font-size: 25px;">Login</h2>
+                        <div class="form-group">
+                            <mat-form-field appearance="fill">
+                                <mat-label>Username</mat-label>
+                                <input type="text" matInput #input maxlength="10" placeholder="Username"
+                                    formControlName="username">
+                            </mat-form-field>
+                        </div>
+                        <div class="form-group">
+                            <mat-form-field appearance="fill">
+                                <mat-label>Enter your password</mat-label>
+                                <input type="password" matInput [type]="hide ? 'password' : 'text'" class="matInput"
+                                    formControlName="password">
+                                <button mat-icon-button matSuffix (click)="hide = !hide"
+                                    [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide">
+                                    <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
+                                </button>
+                            </mat-form-field>
+                        </div>
+                        <div class="form-group">
+                            <div class="example-button-row">
+                                <button mat-raised-button color="primary" (click)="onSubmit()">Submit</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>

@@ -1,0 +1,50 @@
+<div class="card" style="margin: 34px;">
+    <div class="card-container purple-container overflow-hidden">
+        <div class="grid">
+            <div class="col-3 arg1">
+                <mat-form-field appearance="outline">
+                    <mat-label>Source</mat-label>
+                    <input matInput #input placeholder="Source" [(ngModel)]="source" name="source"
+                        ngx-google-places-autocomplete #sourcePlacesRef="ngx-places"
+                        (onAddressChange)="handleAddressChange($event,'source')">
+                    <!-- <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+                    </mat-autocomplete> -->
+                </mat-form-field>
+            </div>
+            <div class="col-3" [@fadeIn]="state">
+                <!-- <i class="pi pi-shake pi-arrow-right-arrow-left" style="font-size: 2rem" (click)="swapText()"></i> -->
+                <button mat-fab matTooltip="Basic" color="primary" aria-label="swap" (click)="swapText()">
+                    <mat-icon>swap_horiz</mat-icon>
+                </button>
+            </div>
+            <div class="col-3 arg1">
+                <mat-form-field appearance="outline">
+                    <mat-label>Destination</mat-label>
+                    <input matInput #input placeholder="Destination" [(ngModel)]="destination" name="destination"
+                        ngx-google-places-autocomplete #destinationPlacesRef="ngx-places"
+                        (onAddressChange)="handleAddressChange($event,'destination')">
+                </mat-form-field>
+            </div>
+            <div class="col-2 arg1">
+                <mat-form-field appearance="outline">
+                    <mat-label>Travel Mode</mat-label>
+                    <mat-select [(value)]="selected">
+                        <mat-option value="1">Driving</mat-option>
+                        <mat-option value="2">Walking</mat-option>
+                        <mat-option value="3">BiCycle</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+            <div class="col-1">
+                <button mat-fab matTooltip="Primary" color="primary" aria-label="Example mini fab with a heart icon"
+                    matSuffix (click)="openDialog()">
+                    <mat-icon>settings</mat-icon>
+                </button>
+            </div>
+        </div>
+        <div class="grid">
+            <button mat-flat-button color="primary" style="width: 15%;" (click)="calculateDistance()">Calculate</button>
+        </div>
+    </div>
+</div>
+<app-city-distance [details]="data" *ngIf="data.data.length>0"></app-city-distance>
