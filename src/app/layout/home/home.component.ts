@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { trigger, state, style, animate, transition } from '@angular/animations';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogBox } from '../dialog-box/dialog-box.component';
@@ -26,7 +26,7 @@ import { min } from 'rxjs';
   ]
 
 })
-export class HomeComponent {
+export class HomeComponent implements OnInit {
 
   source: string = '';
 
@@ -75,6 +75,10 @@ export class HomeComponent {
 
   constructor(public dialog: MatDialog, private layoutservice: LayoutService, private mapservice: MapDirectionsService) { }
 
+  ngOnInit(): void {
+    this.getDetails();
+  }
+
   swapText() {
     this.state = (this.state === 'default') ? 'rotated' : 'default';
     if (this.source.length > 0 && this.destination.length > 0) {
@@ -97,9 +101,12 @@ export class HomeComponent {
 
   }
 
+
+  @ViewChild('serviceHelper') serviceHelper = {};
+
   calculateDistance() {
 
-    if (!this.dialog_box.combinedMode) {
+    if (!this.dialog_box.combinedMode && this.checkPreviousRecord(this.source, this.destination, 'before')) {
 
       if (this.source.length > 0 && this.destination.length > 0 && this.selected.length > 0) {
 
@@ -109,6 +116,32 @@ export class HomeComponent {
 
         let mode: string = (this.selected === '1') ? google.maps.TravelMode.DRIVING
           : (this.selected === '2') ? google.maps.TravelMode.WALKING : google.maps.TravelMode.BICYCLING;
+
+        let sourcelatlng: string = '';
+
+        let destinationlatlng: string = '';
+
+        let sourcelocationtype: string = '';
+
+        let destinatinlocationtype: string = '';
+
+        let service = new google.maps.Geocoder();
+
+        let reqTemplate: google.maps.GeocoderRequest[] = [{ address: this.source }, { address: this.destination }]
+
+        reqTemplate.forEach((reqTemplate) => {
+          service.geocode(reqTemplate, (result: any, status) => {
+            if (status === 'OK') {
+              if (!(sourcelatlng.length > 0)) {
+                sourcelatlng = result[0].geometry.location.lat() + ',' + result[0].geometry.location.lng();
+                sourcelocationtype = result[0].geometry.location.lat() + ',' + result[0].geometry.location_type;
+              } else {
+                destinationlatlng = result[0].geometry.location.lat() + ',' + result[0].geometry.location.lng();
+                destinatinlocationtype = result[0].geometry.location.lat() + ',' + result[0].geometry.location_type;
+              }
+            }
+          }).catch((error) => { console.log(error) });
+        });
 
         this.requestDetails = {
           origins: sourceList,
@@ -122,8 +155,6 @@ export class HomeComponent {
             trafficModel: google.maps.TrafficModel.BEST_GUESS
           }
         }
-
-        console.log(this.requestDetails);
 
         this.layoutservice.getGoogleMatricDistance(this.requestDetails).then((d) => {
           d.subscribe((results) => {
@@ -139,6 +170,10 @@ export class HomeComponent {
                 positionId: this.count++,
                 source: this.source,
                 destination: this.destination,
+                sourcelatlng: sourcelatlng,
+                destinationlatlng: destinationlatlng,
+                source_loc_type: sourcelocationtype,
+                desintation_loc_type: destinatinlocationtype,
                 distance: distance,
                 duration: duration,
                 orginActualAddress: orginAddress,
@@ -147,9 +182,10 @@ export class HomeComponent {
                 settings: this.dialog_box
               };
 
-
-              this.layoutservice.setTraveDetails(travelDeatils);
-              this.getDetails();
+              if (this.checkPreviousRecord(sourcelatlng, destinationlatlng, 'after')) {
+                this.layoutservice.setTraveDetails(travelDeatils);
+                this.getDetails();
+              }
             }
           })
         });
@@ -162,9 +198,12 @@ export class HomeComponent {
 
   getDetails() {
     this.layoutservice.getTravelDetails().subscribe((d) => {
-      this.data.data = d;
-      console.log(d);
-      this.child?.loadPage();
+      if (d.length > 0) {
+        this.data.data = d;
+        console.log(d);
+        this.count = (d.reduce((a, b) => a.positionId > b.positionId ? a : b).positionId) + 1;
+        this.child?.loadPage();
+      }
     })
   }
 
@@ -222,6 +261,10 @@ export class HomeComponent {
           positionId: this.count++,
           source: this.source,
           destination: this.destination,
+          sourcelatlng: '',
+          destinationlatlng: '',
+          source_loc_type: '',
+          desintation_loc_type: '',
           distance: totaldistance + ' Km',
           duration: duration_formatted,
           orginActualAddress: this.source,
@@ -236,6 +279,27 @@ export class HomeComponent {
       })
 
     }
+
+  }
+
+  checkPreviousRecord(origin: string, destination: string, check: string) {
+
+    let value = [];
+
+    if (check === 'before') {
+      value = this.layoutservice.travelDetails.filter((v) => { return (v.source === origin && v.destination === destination) })
+
+      console.log(value);
+
+    } else {
+
+      value = this.layoutservice.travelDetails.filter((v) => { return (v.sourcelatlng === origin && v.destinationlatlng === destination) })
+
+      console.log(value);
+
+    }
+
+    return value.length > 0 ? false : true
 
   }
 

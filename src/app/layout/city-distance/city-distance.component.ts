@@ -33,7 +33,6 @@ export class CityDistanceComponent implements OnInit, AfterViewInit {
   }
 
   onRowClick(row: any) {
-    console.log(row);
 
     this.recordDetails = {
       positionId: row.positionId,

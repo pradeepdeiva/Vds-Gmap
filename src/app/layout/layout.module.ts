@@ -32,7 +32,8 @@ import { GoogleMapsModule } from "@angular/google-maps";
 import { ViewGmapComponent } from "./view-gmap/view-gmap.component";
 import { SingleWayDistance } from "./single-way/single-way.component";
 import { VdsCitiesDistance } from "./vds-cities/vds-cities.component";
-
+import { MatRippleModule } from "@angular/material/core"
+ 
 
 
 @NgModule({
@@ -75,6 +76,7 @@ import { VdsCitiesDistance } from "./vds-cities/vds-cities.component";
         MatDialogModule,
         GooglePlaceModule,
         MatPaginatorModule,
+        MatRippleModule,
         GoogleMapsModule
     ],
     providers: [LayoutService],

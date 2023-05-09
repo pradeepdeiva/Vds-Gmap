@@ -12,20 +12,24 @@ export class LayoutService {
   travelDetails: travelDeatils[] = [];
 
   setTraveDetails(details: travelDeatils) {
+    console.log(details)
     this.travelDetails.push(details);
+    sessionStorage.setItem('insertedItems', JSON.stringify(this.travelDetails))
   }
 
   getTravelDetails(): Observable<travelDeatils[]> {
 
+    let value = JSON.parse(sessionStorage.getItem('insertedItems') || '[]')
+    this.travelDetails = value;
     return of(this.travelDetails);
   }
 
   editTravelDetails(details: any) {
-     return this.travelDetails.filter(data => data.positionId === details.positionId).forEach((e) => {
+    return this.travelDetails.filter(data => data.positionId === details.positionId).forEach((e) => {
       e.source = details.source;
       e.destination = details.destination;
       e.distance = details.distance;
-      e.duration= details.duration;
+      e.duration = details.duration;
     })
   }
 

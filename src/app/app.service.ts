@@ -89,6 +89,7 @@ export class AppService {
     this.OAuth.logOut();
     this.userLoggerIn$.next(false);
     sessionStorage.removeItem('user_info');
+    sessionStorage.removeItem('insertedItems');
     this.router.navigate(['']);
   }
 

@@ -35,6 +35,10 @@ export interface travelDeatils {
     positionId: number,
     source: string,
     destination: string,
+    sourcelatlng: string,
+    destinationlatlng: string,
+    source_loc_type: string,
+    desintation_loc_type: string,
     distance: string,
     duration: string,
     orginActualAddress: string,
@@ -56,11 +60,14 @@ export interface ViewMapDetails {
 
 export interface ViewCityDetails {
 
-    sourceCity:string,
-    destinationCity:string,
-    sourceChineseName:string,
-    destinationChineseName:string,
-    manualdistance:string,
-    systemdistance:string
+    positionId: number,
+    sourceCity: string,
+    destinationCity: string,
+    sourceChineseName: string,
+    destinationChineseName: string,
+    manualdistance: string,
+    systemdistance: string,
+    systemduration: string,
+    travelMode: string,
 
 }

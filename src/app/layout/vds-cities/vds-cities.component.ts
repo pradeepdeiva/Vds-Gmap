@@ -1,10 +1,12 @@
 import { AfterViewInit, Component, OnInit, ViewChild } from "@angular/core";
+import { MatDialog } from "@angular/material/dialog";
 import { MatPaginator } from "@angular/material/paginator";
 import { MatTableDataSource } from "@angular/material/table";
 import { catchError, map, pipe, startWith, switchMap } from "rxjs";
 import { AppService } from "src/app/app.service";
 import { LayoutService } from "src/app/layout.service";
 import { DistanceCalcRequest, ViewCityDetails, ViewMapDetails, travelDeatils } from "src/app/model";
+import { ViewGmapComponent } from "../view-gmap/view-gmap.component";
 
 @Component({
     selector: 'vds-cities',
@@ -19,9 +21,13 @@ export class VdsCitiesDistance implements OnInit, AfterViewInit {
 
     displayedColumns: string[] = ['Source', 'Destination', 'Manual Distance', 'System Distance'];
 
-    @ViewChild(MatPaginator) paginator: MatPaginator = {} as MatPaginator
+    @ViewChild(MatPaginator) paginator: MatPaginator = {} as MatPaginator;
 
-    constructor(private appservice: AppService, private layoutservice: LayoutService) { }
+    recordDetails: ViewMapDetails = {} as ViewMapDetails;
+
+    dialog_result: any;
+
+    constructor(private appservice: AppService, private layoutservice: LayoutService,public gmapdialog: MatDialog) { }
 
     ngOnInit(): void {
 
@@ -32,36 +38,13 @@ export class VdsCitiesDistance implements OnInit, AfterViewInit {
 
     callDetails() {
 
-        let details: ViewCityDetails[] = []
         let ll = this.getdetails('/vdscitydistance/details').subscribe(async (data) => {
             console.log(data);
             if (data != null) {
-                for (let i = 0; i < data.length; i++) {
-
-                    let distance : any;
-                    await this.getSystemdistance(data[i]).then((e)=>{
-                        distance = e
-                    });
-
-                    console.log(distance);
-
-                    let value: ViewCityDetails = {
-                        sourceCity: data[i].sourceCity,
-                        destinationCity: data[i].destinationCity,
-                        sourceChineseName: data[i].sourceChineseName,
-                        destinationChineseName: data[i].destinationChineseName,
-                        manualdistance: data[i].distance,
-                        systemdistance: distance
-                    }
-
-                    details.push(value);
-
-                }
+                this.getAllSystemdistance(data);
             }
-            this.loadpage(details)
 
         });
-
     }
 
     loadpage(value: ViewCityDetails[]) {
@@ -72,13 +55,13 @@ export class VdsCitiesDistance implements OnInit, AfterViewInit {
         this.dataSource.paginator = this.paginator;
     }
 
-    async getSystemdistance(data:any){
+    async getSystemdistance(data: any) {
         console.log(data)
-        let source:string [] = [data.sourceCity];
-        let destination:string [] = [data.destinationCity];
+        let source: string[] = [data.sourceCity];
+        let destination: string[] = [data.destinationCity];
 
-        console.log(source+" "+destination)
-        
+        console.log(source + " " + destination)
+
 
         let reqTempalte = {
             origins: source,
@@ -91,23 +74,106 @@ export class VdsCitiesDistance implements OnInit, AfterViewInit {
 
         let distance = '';
         await this.layoutservice.getGoogleMatricDistance(reqTempalte).then((data) =>
-        data.subscribe((value)=>{
-            console.log(value);
-            distance = value.rows[0].elements[0].distance.text
-        }))
+            data.subscribe((value) => {
+                console.log(value);
+                distance = value.rows[0].elements[0].distance.text
+            }))
 
         return distance;
 
     }
 
+    async getAllSystemdistance(data: any[]) {
+
+        let details: ViewCityDetails[] = [];
+        let source: string[] = [];
+        let destination: string[] = [];
+
+        data.forEach((s) => { source.push(s.sourceCity) });
+        data.forEach((d) => { destination.push(d.destinationCity) });
 
 
-    onRowClick(even: any) {
+        let reqTempalte = {
+            origins: source,
+            destinations: destination,
+            travelMode: google.maps.TravelMode.DRIVING,
+            unitSystem: 0,
+            avoidHighways: false,
+            avoidTolls: false
+        }
+
+        await this.layoutservice.getGoogleMatricDistance(reqTempalte).then((d) =>
+            d.subscribe((value) => {
+                console.log(value);
+                let output: ViewCityDetails = {} as ViewCityDetails;
+                value.rows.forEach((result: any, index: number) => {
+                    output = {
+                        positionId: index,
+                        sourceCity: data[index].sourceCity,
+                        destinationCity: data[index].destinationCity,
+                        sourceChineseName: data[index].sourceChineseName,
+                        destinationChineseName: data[index].destinationChineseName,
+                        manualdistance: data[index].distance + " km",
+                        systemdistance: result.elements[index].distance.text,
+                        systemduration: result.elements[index].duration.text,
+                        travelMode: google.maps.TravelMode.DRIVING
+                    }
+
+                    details.push(output);
+
+                })
+
+            }))
+
+        this.loadpage(details);
+
+
+    }
+
+
+
+    onRowClick(row: any) {
+
+        console.log(row);
+
+        this.recordDetails = {
+            positionId: row.positionId,
+            source: row.sourceCity,
+            destination: row.destinationCity,
+            distance: row.systemdistance,
+            duration: row.systemduration,
+            travelMode: row.travelMode,
+            settings: {
+                avoidToll: false,
+                avoidHighways: false,
+                combinedMode: false,
+                picker: '',
+                waypoints:[]
+            }
+          }
+      
+          this.openDialog(this.recordDetails);
+
+    }
+
+    openDialog(view:any){
+
+        const dialogRef = this.gmapdialog.open(ViewGmapComponent, {
+            disableClose: true,
+            data: view,
+            maxWidth: '95vw'
+          });
+      
+          dialogRef.afterClosed().subscribe((result: any) => {
+            console.log(`Dialog result: ${JSON.stringify(result)}`);
+            this.dialog_result = result;
+          });
+
 
     }
 
     ngAfterViewInit(): void {
-    
+
     }
 
     getdetails(url: string) {
