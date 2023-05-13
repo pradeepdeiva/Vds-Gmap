@@ -1,12 +1,13 @@
 import { AfterViewInit, Component, OnInit, ViewChild } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
-import { MatPaginator } from "@angular/material/paginator";
+import { MatPaginator, PageEvent } from "@angular/material/paginator";
 import { MatTableDataSource } from "@angular/material/table";
 import { catchError, map, pipe, startWith, switchMap } from "rxjs";
 import { AppService } from "src/app/app.service";
 import { LayoutService } from "src/app/layout.service";
 import { DistanceCalcRequest, ViewCityDetails, ViewMapDetails, travelDeatils } from "src/app/model";
 import { ViewGmapComponent } from "../view-gmap/view-gmap.component";
+import { NgxSpinnerService } from "ngx-spinner";
 
 @Component({
     selector: 'vds-cities',
@@ -27,18 +28,21 @@ export class VdsCitiesDistance implements OnInit, AfterViewInit {
 
     dialog_result: any;
 
-    constructor(private appservice: AppService, private layoutservice: LayoutService,public gmapdialog: MatDialog) { }
+    details: ViewCityDetails[] = [];
+
+    constructor(private appservice: AppService, private layoutservice: LayoutService, public gmapdialog: MatDialog, private spinner: NgxSpinnerService) { }
 
     ngOnInit(): void {
 
-        this.callDetails();
+        this.callDetails('0', '20');
 
     }
 
 
-    callDetails() {
+    callDetails(page: string, size: string) {
 
-        let ll = this.getdetails('/vdscitydistance/details').subscribe(async (data) => {
+        this.spinner.show();
+        let ll = this.getdetails('/vdscitydistance/details?page=' + page + '&size=' + size).subscribe(async (data) => {
             console.log(data);
             if (data != null) {
                 this.getAllSystemdistance(data);
@@ -53,6 +57,7 @@ export class VdsCitiesDistance implements OnInit, AfterViewInit {
         console.log(this.cityDetails)
         this.dataSource = new MatTableDataSource<ViewCityDetails>(this.cityDetails);
         this.dataSource.paginator = this.paginator;
+        this.spinner.hide();
     }
 
     async getSystemdistance(data: any) {
@@ -85,52 +90,68 @@ export class VdsCitiesDistance implements OnInit, AfterViewInit {
 
     async getAllSystemdistance(data: any[]) {
 
-        let details: ViewCityDetails[] = [];
         let source: string[] = [];
         let destination: string[] = [];
 
-        data.forEach((s) => { source.push(s.sourceCity) });
-        data.forEach((d) => { destination.push(d.destinationCity) });
+        let len = 9;
+        for (let i = 0; i < data.length; i++) {
 
+            source = [];
+            destination = [];
 
-        let reqTempalte = {
-            origins: source,
-            destinations: destination,
-            travelMode: google.maps.TravelMode.DRIVING,
-            unitSystem: 0,
-            avoidHighways: false,
-            avoidTolls: false
+            let checkProgess = true;
+
+            data.slice(i, len+1).map((s) => { return source.push(s.sourceCity) });
+            data.slice(i, len+1).map((d) => { return destination.push(d.destinationCity) });
+
+            console.log("Index: " + i + " Length: " + (len+1));
+            console.log("Source: " + source + " " + " Destination: " + destination)
+
+            let reqTempalte = {
+                origins: source,
+                destinations: destination,
+                travelMode: google.maps.TravelMode.DRIVING,
+                unitSystem: 0,
+                avoidHighways: false,
+                avoidTolls: false
+            }
+
+            if (checkProgess) {
+                checkProgess = false
+                await this.layoutservice.getGoogleMatricDistance(reqTempalte).then((d) =>
+                    d.subscribe((value) => {
+                        console.log(value);
+                        let output: ViewCityDetails = {} as ViewCityDetails;
+                        value.rows.forEach((result: any, index: number) => {
+                            output = {
+                                positionId: index,
+                                sourceCity: data.slice(i, len+1)[index].sourceCity,
+                                destinationCity: data.slice(i, len+1)[index].destinationCity,
+                                sourceChineseName: data.slice(i, len+1)[index].sourceChineseName,
+                                destinationChineseName: data.slice(i, len+1)[index].destinationChineseName,
+                                manualdistance: data.slice(i, len+1)[index].distance + " km",
+                                systemdistance: result.elements[index].status === 'OK' ? result.elements[index].distance.text : "Failed",
+                                systemduration: result.elements[index].status === 'OK' ? result.elements[index].duration.text : "Failed",
+                                travelMode: google.maps.TravelMode.DRIVING
+                            }
+
+                            this.details.push(output);
+
+                        })
+
+                        checkProgess = true;
+
+                    }));
+
+                i = len;
+                len = len + 10;
+            }
         }
 
-        await this.layoutservice.getGoogleMatricDistance(reqTempalte).then((d) =>
-            d.subscribe((value) => {
-                console.log(value);
-                let output: ViewCityDetails = {} as ViewCityDetails;
-                value.rows.forEach((result: any, index: number) => {
-                    output = {
-                        positionId: index,
-                        sourceCity: data[index].sourceCity,
-                        destinationCity: data[index].destinationCity,
-                        sourceChineseName: data[index].sourceChineseName,
-                        destinationChineseName: data[index].destinationChineseName,
-                        manualdistance: data[index].distance + " km",
-                        systemdistance: result.elements[index].distance.text,
-                        systemduration: result.elements[index].duration.text,
-                        travelMode: google.maps.TravelMode.DRIVING
-                    }
-
-                    details.push(output);
-
-                })
-
-            }))
-
-        this.loadpage(details);
+        this.loadpage(this.details);
 
 
     }
-
-
 
     onRowClick(row: any) {
 
@@ -148,31 +169,35 @@ export class VdsCitiesDistance implements OnInit, AfterViewInit {
                 avoidHighways: false,
                 combinedMode: false,
                 picker: '',
-                waypoints:[]
+                waypoints: []
             }
-          }
-      
-          this.openDialog(this.recordDetails);
+        }
+
+        this.openDialog(this.recordDetails);
 
     }
 
-    openDialog(view:any){
+    openDialog(view: any) {
 
         const dialogRef = this.gmapdialog.open(ViewGmapComponent, {
             disableClose: true,
             data: view,
             maxWidth: '95vw'
-          });
-      
-          dialogRef.afterClosed().subscribe((result: any) => {
+        });
+
+        dialogRef.afterClosed().subscribe((result: any) => {
             console.log(`Dialog result: ${JSON.stringify(result)}`);
             this.dialog_result = result;
-          });
+        });
 
 
     }
 
     ngAfterViewInit(): void {
+    }
+
+    handlePage(event: PageEvent) {
+        console.log(event);
 
     }
 

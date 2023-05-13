@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, Input, IterableDiffers, OnInit, ViewChild } from '@angular/core';
-import { DialogSetting, ViewMapDetails, travelDeatils } from '../../model';
+import { DialogSetting, ViewMapDetails, postReqTemp, travelDeatils } from '../../model';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { LayoutService } from '../../layout.service';
@@ -25,7 +25,20 @@ export class CityDistanceComponent implements OnInit, AfterViewInit {
 
   constructor(private layout: LayoutService, public gmapdialog: MatDialog) { }
 
-  ngOnInit(): void { }
+  ngOnInit(): void {
+    let startTime = new Date().getTime()
+    let i = 0;
+    // for (let i = 0; i < 5; i++) {
+      let iterval = setInterval(() => {
+        console.log(iterval)
+        if(++i ==  5){
+          clearInterval(iterval);
+        }else{
+          console.log('Index: '+i);
+        }
+      }, 1000);
+    // }
+  }
 
 
   public loadPage() {
@@ -58,6 +71,32 @@ export class CityDistanceComponent implements OnInit, AfterViewInit {
       console.log(`Dialog result: ${JSON.stringify(result)}`);
       this.dialog_result = result;
     });
+  }
+
+  submitRecords() {
+
+    let citydistance: postReqTemp[] = [];
+    if (this.details.data.length > 0) {
+      this.details.data.forEach((value) => {
+
+        citydistance.push({
+          source: value.source,
+          destination: value.destination,
+          distance: value.distance,
+          duration: value.duration,
+          travelMode: value.travelMode,
+          geometricDetails: [value.sourceAddress, value.destinationAddress],
+          autoCitySettings: value.settings,
+          destinationActualAddress: value.destinationActualAddress,
+          orginActualAddress: value.orginActualAddress,
+          positionId: value.positionId
+        })
+      });
+    }
+  }
+
+  clearTable() {
+
   }
 
   ngAfterViewInit(): void {

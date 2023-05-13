@@ -33,6 +33,7 @@ import { ViewGmapComponent } from "./view-gmap/view-gmap.component";
 import { SingleWayDistance } from "./single-way/single-way.component";
 import { VdsCitiesDistance } from "./vds-cities/vds-cities.component";
 import { MatRippleModule } from "@angular/material/core"
+import { NgxSpinnerModule } from "ngx-spinner";
  
 
 
@@ -77,7 +78,8 @@ import { MatRippleModule } from "@angular/material/core"
         GooglePlaceModule,
         MatPaginatorModule,
         MatRippleModule,
-        GoogleMapsModule
+        GoogleMapsModule,
+        NgxSpinnerModule
     ],
     providers: [LayoutService],
     exports: [],

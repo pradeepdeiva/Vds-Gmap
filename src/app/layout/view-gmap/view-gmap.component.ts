@@ -1,7 +1,8 @@
 import { makeBindingParser } from '@angular/compiler';
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, ViewChild } from '@angular/core';
 import { MapDirectionsService } from '@angular/google-maps';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { GooglePlaceDirective } from 'ngx-google-places-autocomplete';
 import { Observable, map } from 'rxjs';
 import { LayoutService } from 'src/app/layout.service';
 import { DirectionRequest, ViewMapDetails, travelDeatils } from 'src/app/model';
@@ -32,6 +33,10 @@ export class ViewGmapComponent {
   marker: google.maps.Marker = {} as google.maps.Marker
 
   markerPositions: google.maps.LatLngLiteral[] = [];
+
+  @ViewChild("sourcePlacesRef") sourceRef: GooglePlaceDirective | undefined;
+
+  @ViewChild("destinationPlacesRef") destinationRef: GooglePlaceDirective | undefined;
 
 
   directionsRenderOption: {} = new google.maps.DirectionsRenderer({

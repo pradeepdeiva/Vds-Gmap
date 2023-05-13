@@ -1,9 +1,9 @@
 <mat-dialog-content class="mat-typography">
-    <div class="card" style="margin: 34px;">
+    <div class="card" style="margin: 17px;">
         <div class="card-container purple-container overflow-hidden">
             <div class="grid">
-                <div class="col-8" style="display: flex;justify-content: center;">
-                    <google-map height="400px" width="850px" [center]="center" [zoom]="zoom"
+                <div class="col-7" style="display: flex;justify-content: center;">
+                    <google-map height="400px" width="650px" [center]="center" [zoom]="zoom"
                         (mapClick)="addMarker($event)" [disableDefaultUI]="false" [showDirection]="this.displayDirections">
 
                         <map-marker *ngFor="let markerPosition of markerPositions" [options]="markerOptions"
@@ -15,16 +15,18 @@
 
                     </google-map>
                 </div>
-                <div class="col-4">
+                <div class="col-5">
                     <div class="grid arg">
                         <mat-form-field appearance="outline">
                             <mat-label>Source</mat-label>
                             <input matInput #input placeholder="Source" [disabled]="editmode" [(ngModel)]="editsource"
+                            ngx-google-places-autocomplete #sourcePlacesRef="ngx-places"
                                 name="editsource">
                         </mat-form-field>
                         <mat-form-field appearance="outline">
                             <mat-label>Destination</mat-label>
                             <input matInput #input placeholder="Destination" [disabled]="editmode"
+                            ngx-google-places-autocomplete #destinationPlacesRef="ngx-places"
                                 [(ngModel)]="editdestination" name="editdestination">
                         </mat-form-field>
 

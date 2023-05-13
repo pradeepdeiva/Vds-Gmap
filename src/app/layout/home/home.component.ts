@@ -5,11 +5,11 @@ import { DialogBox } from '../dialog-box/dialog-box.component';
 import { GooglePlaceDirective } from 'ngx-google-places-autocomplete/ngx-google-places-autocomplete.directive';
 import { Address } from 'ngx-google-places-autocomplete/objects/address';
 import { LayoutService } from 'src/app/layout.service';
-import { DialogSetting, DistanceCalcRequest, travelDeatils } from 'src/app/model';
+import { DialogSetting, DistanceCalcRequest, addressComponent, geometryDetails, sourDistDetails, travelDeatils } from 'src/app/model';
 import { MatTableDataSource } from '@angular/material/table';
 import { CityDistanceComponent } from 'src/app/layout/city-distance/city-distance.component';
 import { MapDirectionsService } from '@angular/google-maps';
-import { min } from 'rxjs';
+import { catchError, min } from 'rxjs';
 
 
 @Component({
@@ -117,27 +117,47 @@ export class HomeComponent implements OnInit {
         let mode: string = (this.selected === '1') ? google.maps.TravelMode.DRIVING
           : (this.selected === '2') ? google.maps.TravelMode.WALKING : google.maps.TravelMode.BICYCLING;
 
+        let sourcegeometric: sourDistDetails = {} as sourDistDetails;
+
+        let destinationgeometric: sourDistDetails = {} as sourDistDetails;
+
+        let addCmp: addressComponent = {} as addressComponent;
+
         let sourcelatlng: string = '';
 
         let destinationlatlng: string = '';
-
-        let sourcelocationtype: string = '';
-
-        let destinatinlocationtype: string = '';
 
         let service = new google.maps.Geocoder();
 
         let reqTemplate: google.maps.GeocoderRequest[] = [{ address: this.source }, { address: this.destination }]
 
-        reqTemplate.forEach((reqTemplate) => {
-          service.geocode(reqTemplate, (result: any, status) => {
+        reqTemplate.forEach((req) => {
+          service.geocode(req, (result: any, status) => {
             if (status === 'OK') {
-              if (!(sourcelatlng.length > 0)) {
-                sourcelatlng = result[0].geometry.location.lat() + ',' + result[0].geometry.location.lng();
-                sourcelocationtype = result[0].geometry.location.lat() + ',' + result[0].geometry.location_type;
+              console.log(result);
+              console.log(Object.keys(sourcegeometric).length === 0)
+              if (Object.keys(sourcegeometric).length === 0) {
+                sourcegeometric = {
+                  latitude: result[0].geometry.location.lat(),
+                  longtitude: result[0].geometry.location.lng(),
+                  locationType: result[0].geometry.location_type,
+                  formattedAddress: result[0].formatted_address,
+                  country: result[0].address_components.find((s: any) => s.types.includes("country")).long_name,
+                  province: result[0].address_components.find((s: any) => s.types.includes("administrative_area_level_1")).long_name,
+                  locality: result[0].address_components.find((s: any) => s.types.includes("administrative_area_level_3")).long_name,
+                  addrType: 'S'
+                  }
               } else {
-                destinationlatlng = result[0].geometry.location.lat() + ',' + result[0].geometry.location.lng();
-                destinatinlocationtype = result[0].geometry.location.lat() + ',' + result[0].geometry.location_type;
+                destinationgeometric = {
+                  latitude: result[0].geometry.location.lat(),
+                  longtitude: result[0].geometry.location.lng(),
+                  locationType: result[0].geometry.location_type,
+                  formattedAddress: result[0].formatted_address,
+                  country: result[0].address_components.find((s: any) => s.types.includes("country")).long_name,
+                  province: result[0].address_components.find((s: any) => s.types.includes("administrative_area_level_1")).long_name,
+                  locality: result[0].address_components.find((s: any) => s.types.includes("administrative_area_level_3")).long_name,
+                  addrType: 'D'
+                  }
               }
             }
           }).catch((error) => { console.log(error) });
@@ -159,36 +179,35 @@ export class HomeComponent implements OnInit {
         this.layoutservice.getGoogleMatricDistance(this.requestDetails).then((d) => {
           d.subscribe((results) => {
             console.log(results);
+            if (results.rows[0].elements[0].status === 'OK') {
+              for (let i = 0; i < results.rows.length; i++) {
+                let distance = results.rows[i].elements[i].distance.text
+                let duration = results.rows[i].elements[i].duration.text
+                let orginAddress = results.originAddresses[i]
+                let destinationAddress = results.destinationAddresses[i]
 
-            for (let i = 0; i < results.rows.length; i++) {
-              let distance = results.rows[i].elements[i].distance.text
-              let duration = results.rows[i].elements[i].duration.text
-              let orginAddress = results.originAddresses[i]
-              let destinationAddress = results.destinationAddresses[i]
+                let travelDeatils: travelDeatils = {
+                  positionId: this.count++,
+                  source: this.source,
+                  destination: this.destination,
+                  sourceAddress: sourcegeometric,
+                  destinationAddress: destinationgeometric,
+                  distance: distance,
+                  duration: duration,
+                  orginActualAddress: orginAddress,
+                  destinationActualAddress: destinationAddress,
+                  travelMode: mode,
+                  settings: this.dialog_box
+                };
 
-              let travelDeatils: travelDeatils = {
-                positionId: this.count++,
-                source: this.source,
-                destination: this.destination,
-                sourcelatlng: sourcelatlng,
-                destinationlatlng: destinationlatlng,
-                source_loc_type: sourcelocationtype,
-                desintation_loc_type: destinatinlocationtype,
-                distance: distance,
-                duration: duration,
-                orginActualAddress: orginAddress,
-                destinationActualAddress: destinationAddress,
-                travelMode: mode,
-                settings: this.dialog_box
-              };
-
-              if (this.checkPreviousRecord(sourcelatlng, destinationlatlng, 'after')) {
-                this.layoutservice.setTraveDetails(travelDeatils);
-                this.getDetails();
+                if (this.checkPreviousRecord(sourcelatlng, destinationlatlng, 'after')) {
+                  this.layoutservice.setTraveDetails(travelDeatils);
+                  this.getDetails();
+                }
               }
             }
           })
-        });
+        }).catch((error) => { console.log(error) });
       }
     } else {
       this.getCombinedDirectionReq();
@@ -261,10 +280,8 @@ export class HomeComponent implements OnInit {
           positionId: this.count++,
           source: this.source,
           destination: this.destination,
-          sourcelatlng: '',
-          destinationlatlng: '',
-          source_loc_type: '',
-          desintation_loc_type: '',
+          sourceAddress: {} as sourDistDetails,
+          destinationAddress: {} as sourDistDetails,
           distance: totaldistance + ' Km',
           duration: duration_formatted,
           orginActualAddress: this.source,
@@ -293,7 +310,7 @@ export class HomeComponent implements OnInit {
 
     } else {
 
-      value = this.layoutservice.travelDetails.filter((v) => { return (v.sourcelatlng === origin && v.destinationlatlng === destination) })
+      value = this.layoutservice.travelDetails.filter((v) => { return ((v.sourceAddress.latitude +","+ v.sourceAddress.longtitude)=== origin && (v.destinationAddress.latitude+","+v.destinationAddress.longtitude) === destination) })
 
       console.log(value);
 

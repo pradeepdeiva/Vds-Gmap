@@ -50,3 +50,7 @@
         </div>
     </div>
 </div>
+<div class="grid" *ngIf="(details.data.length > 0)">
+    <button mat-flat-button color="primary" style="width: 10%; margin: 0px 25px;" (click)="submitRecords()">Submit</button>
+    <button mat-flat-button color="primary" style="width: 10%; margin: 0px 25px;" (click)="clearTable()">Cancel</button>
+</div>

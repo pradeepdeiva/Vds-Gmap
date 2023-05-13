@@ -1,3 +1,6 @@
+<ngx-spinner bdColor="rgba(0, 0, 0, 0.8)" size="medium" color="#fff" type="ball-spin-clockwise" [fullScreen]="true">
+    <p style="color: white"> Loading... </p>
+</ngx-spinner>
 <div class="container" class="contat">
     <div class="grid">
         <div class="mat-elevation-z8">
@@ -45,7 +48,7 @@
             </table>
 
             <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons
-                aria-label="Select page of periodic elements">
+                aria-label="Select page of periodic elements" (page)="handlePage($event)">
             </mat-paginator>
         </div>
     </div>

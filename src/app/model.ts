@@ -35,18 +35,28 @@ export interface travelDeatils {
     positionId: number,
     source: string,
     destination: string,
-    sourcelatlng: string,
-    destinationlatlng: string,
-    source_loc_type: string,
-    desintation_loc_type: string,
+    sourceAddress: sourDistDetails,
+    destinationAddress: sourDistDetails
     distance: string,
     duration: string,
     orginActualAddress: string,
     destinationActualAddress: string,
-    travelMode: string
+    travelMode: string,
     settings: DialogSetting
 }
 
+export interface addressComponent {
+    country: string,
+    province: string,
+    locality: string
+}
+
+export interface geometryDetails {
+    latlng: string,
+    loc_type: string,
+    formattedaddr: string,
+    addrcmp: addressComponent
+}
 
 export interface ViewMapDetails {
     positionId: number,
@@ -71,3 +81,28 @@ export interface ViewCityDetails {
     travelMode: string,
 
 }
+
+export interface postReqTemp {
+    source: string,
+    destination: string,
+    distance: string,
+    duration: string,
+    travelMode: string,
+    geometricDetails: sourDistDetails[],
+    autoCitySettings: DialogSetting
+    destinationActualAddress: string,
+    orginActualAddress: string,
+    positionId: number
+}
+
+export interface sourDistDetails {
+        latitude: string,
+        longtitude: string,
+        locationType: string,
+        formattedAddress: string,
+        country: string,
+        province: string,
+        locality: string,
+        addrType: string        
+}
+
