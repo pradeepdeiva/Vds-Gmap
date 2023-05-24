@@ -1,0 +1,35 @@
+<ngx-spinner bdColor="rgba(0, 0, 0, 0.8)" size="medium" color="#fff" type="ball-spin-clockwise" [fullScreen]="true">
+    <p style="color: white"> Loading... </p>
+</ngx-spinner>
+<div class="container" class="contat" *ngIf="dataSource.data.length>0">
+    <div class="grid">
+        <div class="mat-elevation-z8">
+            <table mat-table [dataSource]="dataSource" class="mat-elevation-z8 demo-table">
+
+                <ng-container matColumnDef="Source">
+                    <th mat-header-cell class="center-cell" *matHeaderCellDef> Source </th>
+                    <td mat-cell class="center-cell" *matCellDef="let element">
+                        {{element.sourceCity}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="Destination">
+                    <th mat-header-cell class="center-cell" *matHeaderCellDef> Destination </th>
+                    <td mat-cell class="center-cell" *matCellDef="let element" >
+                        {{element.destinationCity}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="Manual Distance">
+                    <th mat-header-cell class="center-cell" *matHeaderCellDef> Manual Distance </th>
+                    <td mat-cell class="center-cell" *matCellDef="let element"> {{element.distance}} </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            </table>
+
+            <mat-paginator #paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons
+                aria-label="Select page of periodic elements">
+            </mat-paginator>
+        </div>
+    </div>
+</div>
