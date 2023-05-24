@@ -9,7 +9,8 @@ import { DialogSetting, DistanceCalcRequest, addressComponent, geometryDetails, 
 import { MatTableDataSource } from '@angular/material/table';
 import { CityDistanceComponent } from 'src/app/layout/city-distance/city-distance.component';
 import { MapDirectionsService } from '@angular/google-maps';
-import { catchError, min } from 'rxjs';
+import { Observable, catchError, min, of } from 'rxjs';
+import { NgxSpinnerService } from 'ngx-spinner';
 
 
 @Component({
@@ -43,7 +44,8 @@ export class HomeComponent implements OnInit {
     avoidToll: false,
     avoidHighways: false,
     combinedMode: false,
-    waypoints: []
+    waypoints: [],
+    waylocations:[]
   }
 
   @ViewChild("sourcePlacesRef") sourceRef: GooglePlaceDirective | undefined;
@@ -73,7 +75,7 @@ export class HomeComponent implements OnInit {
     });
   }
 
-  constructor(public dialog: MatDialog, private layoutservice: LayoutService, private mapservice: MapDirectionsService) { }
+  constructor(public dialog: MatDialog, private layoutservice: LayoutService, private mapservice: MapDirectionsService, private spinner: NgxSpinnerService) { }
 
   ngOnInit(): void {
     this.getDetails();
@@ -106,6 +108,7 @@ export class HomeComponent implements OnInit {
 
   calculateDistance() {
 
+    this.spinner.show();
     if (!this.dialog_box.combinedMode && this.checkPreviousRecord(this.source, this.destination, 'before')) {
 
       if (this.source.length > 0 && this.destination.length > 0 && this.selected.length > 0) {
@@ -117,9 +120,9 @@ export class HomeComponent implements OnInit {
         let mode: string = (this.selected === '1') ? google.maps.TravelMode.DRIVING
           : (this.selected === '2') ? google.maps.TravelMode.WALKING : google.maps.TravelMode.BICYCLING;
 
-        let sourcegeometric: sourDistDetails = {} as sourDistDetails;
+        // let sourcegeometric: sourDistDetails = {} as sourDistDetails;
 
-        let destinationgeometric: sourDistDetails = {} as sourDistDetails;
+        // let destinationgeometric: sourDistDetails = {} as sourDistDetails;
 
         let addCmp: addressComponent = {} as addressComponent;
 
@@ -131,34 +134,14 @@ export class HomeComponent implements OnInit {
 
         let reqTemplate: google.maps.GeocoderRequest[] = [{ address: this.source }, { address: this.destination }]
 
+        this.sourcegeometric = {} as sourDistDetails;
+        this.destinationgeometric = {} as sourDistDetails;
+
         reqTemplate.forEach((req) => {
-          service.geocode(req, (result: any, status) => {
+          service.geocode(req, async (result: any, status) => {
             if (status === 'OK') {
               console.log(result);
-              console.log(Object.keys(sourcegeometric).length === 0)
-              if (Object.keys(sourcegeometric).length === 0) {
-                sourcegeometric = {
-                  latitude: result[0].geometry.location.lat(),
-                  longtitude: result[0].geometry.location.lng(),
-                  locationType: result[0].geometry.location_type,
-                  formattedAddress: result[0].formatted_address,
-                  country: result[0].address_components.find((s: any) => s.types.includes("country")).long_name,
-                  province: result[0].address_components.find((s: any) => s.types.includes("administrative_area_level_1")).long_name,
-                  locality: result[0].address_components.find((s: any) => s.types.includes("administrative_area_level_3")).long_name,
-                  addrType: 'S'
-                  }
-              } else {
-                destinationgeometric = {
-                  latitude: result[0].geometry.location.lat(),
-                  longtitude: result[0].geometry.location.lng(),
-                  locationType: result[0].geometry.location_type,
-                  formattedAddress: result[0].formatted_address,
-                  country: result[0].address_components.find((s: any) => s.types.includes("country")).long_name,
-                  province: result[0].address_components.find((s: any) => s.types.includes("administrative_area_level_1")).long_name,
-                  locality: result[0].address_components.find((s: any) => s.types.includes("administrative_area_level_3")).long_name,
-                  addrType: 'D'
-                  }
-              }
+              await this.updateGeometricDetails(result);
             }
           }).catch((error) => { console.log(error) });
         });
@@ -190,8 +173,8 @@ export class HomeComponent implements OnInit {
                   positionId: this.count++,
                   source: this.source,
                   destination: this.destination,
-                  sourceAddress: sourcegeometric,
-                  destinationAddress: destinationgeometric,
+                  sourceAddress: this.sourcegeometric,
+                  destinationAddress: this.destinationgeometric,
                   distance: distance,
                   duration: duration,
                   orginActualAddress: orginAddress,
@@ -209,9 +192,48 @@ export class HomeComponent implements OnInit {
           })
         }).catch((error) => { console.log(error) });
       }
+      this.spinner.hide();
     } else {
       this.getCombinedDirectionReq();
     }
+
+  }
+  sourcegeometric: sourDistDetails = {} as sourDistDetails;
+
+  destinationgeometric: sourDistDetails = {} as sourDistDetails;
+  updateGeometricDetails(result: any): Promise<string> {
+
+    console.log(Object.keys(this.sourcegeometric).length === 0)
+    if (Object.keys(this.sourcegeometric).length === 0) {
+      this.sourcegeometric = {
+        latitude: result[0].geometry.location.lat(),
+        longtitude: result[0].geometry.location.lng(),
+        locationType: result[0].geometry.location_type,
+        formattedAddress: result[0].formatted_address,
+        country: result[0].address_components.find((s: any) => s.types.includes("country")).long_name,
+        province: result[0].address_components.find((s: any) => s.types.includes("administrative_area_level_1")).long_name,
+        locality: result[0].address_components.find((s: any) => s.types.includes("administrative_area_level_3"))?.long_name,
+        addrType: 'S',
+        sourceChinese: '',
+        destinationChinese: ''
+      }
+    } else {
+      this.destinationgeometric = {
+        latitude: result[0].geometry.location.lat(),
+        longtitude: result[0].geometry.location.lng(),
+        locationType: result[0].geometry.location_type,
+        formattedAddress: result[0].formatted_address,
+        country: result[0].address_components.find((s: any) => s.types.includes("country")).long_name,
+        province: result[0].address_components.find((s: any) => s.types.includes("administrative_area_level_1")).long_name,
+        locality: result[0].address_components.find((s: any) => s.types.includes("administrative_area_level_3"))?.long_name,
+        addrType: 'D',
+        sourceChinese: '',
+        destinationChinese: ''
+      }
+    }
+
+    let res: any = 'success';
+    return res
 
   }
 
@@ -222,6 +244,8 @@ export class HomeComponent implements OnInit {
         console.log(d);
         this.count = (d.reduce((a, b) => a.positionId > b.positionId ? a : b).positionId) + 1;
         this.child?.loadPage();
+        this.source = '';
+        this.destination = '';
       }
     })
   }
@@ -230,6 +254,9 @@ export class HomeComponent implements OnInit {
 
     let mode: any = (this.selected === '1') ? google.maps.TravelMode.DRIVING
       : (this.selected === '2') ? google.maps.TravelMode.WALKING : google.maps.TravelMode.BICYCLING;
+
+      this.sourcegeometric = {} as sourDistDetails;
+      this.destinationgeometric = {} as sourDistDetails;
 
     if (this.source.length > 0 && this.destination.length > 0 && mode.length > 0 && this.dialog_box.combinedMode) {
       let directionReq = {
@@ -241,6 +268,19 @@ export class HomeComponent implements OnInit {
         avoidTolls: this.dialog_box.avoidToll,
         avoidHighways: this.dialog_box.avoidHighways
       };
+
+      let service = new google.maps.Geocoder();
+
+      let reqTemplate: google.maps.GeocoderRequest[] = [{ address: this.source }, { address: this.destination }]
+
+      reqTemplate.forEach((req) => {
+        service.geocode(req, async (result: any, status) => {
+          if (status === 'OK') {
+            console.log(result);
+            await this.updateGeometricDetails(result);
+          }
+        }).catch((error) => { console.log(error) });
+      });
 
       let result = this.mapservice.route(directionReq);
 
@@ -280,8 +320,8 @@ export class HomeComponent implements OnInit {
           positionId: this.count++,
           source: this.source,
           destination: this.destination,
-          sourceAddress: {} as sourDistDetails,
-          destinationAddress: {} as sourDistDetails,
+          sourceAddress: this.sourcegeometric,
+          destinationAddress: this.destinationgeometric,
           distance: totaldistance + ' Km',
           duration: duration_formatted,
           orginActualAddress: this.source,
@@ -296,6 +336,7 @@ export class HomeComponent implements OnInit {
       })
 
     }
+    this.spinner.hide();
 
   }
 
@@ -310,7 +351,7 @@ export class HomeComponent implements OnInit {
 
     } else {
 
-      value = this.layoutservice.travelDetails.filter((v) => { return ((v.sourceAddress.latitude +","+ v.sourceAddress.longtitude)=== origin && (v.destinationAddress.latitude+","+v.destinationAddress.longtitude) === destination) })
+      value = this.layoutservice.travelDetails.filter((v) => { return ((v.sourceAddress.latitude + "," + v.sourceAddress.longtitude) === origin && (v.destinationAddress.latitude + "," + v.destinationAddress.longtitude) === destination) })
 
       console.log(value);
 
