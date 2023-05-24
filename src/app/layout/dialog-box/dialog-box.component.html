@@ -4,7 +4,8 @@
       <mat-form-field appearance="outline">
         <mat-label>Depature Time</mat-label>
         <input matInput [ngxMatDatetimePicker]="picker" placeholder="Choose a date & time"
-          [formControl]="datatimepicker">
+          [formControl]="datatimepicker" (ngModelChange)="checkDate($event)">
+        <mat-error *ngIf="datatimepicker.invalid">{{getErrorMessage()}}</mat-error>
         <mat-datepicker-toggle matSuffix [for]="$any(picker)"></mat-datepicker-toggle>
         <ngx-mat-datetime-picker #picker></ngx-mat-datetime-picker>
       </mat-form-field>
@@ -21,10 +22,12 @@
       <div class="col-4" style="margin-left: 20px;">
         <mat-form-field appearance="outline">
           <mat-label>Location</mat-label>
-          <input matInput [(ngModel)]="location" name="location" placeholder="Location">
+          <input matInput [(ngModel)]="location" name="location" placeholder="Location"
+          ngx-google-places-autocomplete #sourcePlacesRef="ngx-places"
+          (onAddressChange)="handleAddressChange($event)">
           <!-- <div class="example-button"> -->
           <button mat-flat-button matTooltip="Primary" color="primary" aria-label="Example mini fab with a heart icon"
-            matSuffix style="height: 54px;" (click)="addLocation()">
+            matSuffix style="height: 54px;" (click)="addLocation()" [disabled]="(waypoints.length === 5)">
             <mat-icon style="margin: 0;">double_arrow</mat-icon>
           </button>
           <!-- </div> -->
