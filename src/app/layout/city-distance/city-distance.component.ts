@@ -5,6 +5,9 @@ import { MatPaginator } from '@angular/material/paginator';
 import { LayoutService } from '../../layout.service';
 import { ViewGmapComponent } from '../view-gmap/view-gmap.component';
 import { MatDialog } from '@angular/material/dialog';
+import { MessageService } from 'primeng/api';
+import { ConfirmEventType, ConfirmationService } from 'primeng/api';
+import { NgxSpinnerService } from 'ngx-spinner';
 
 @Component({
   selector: 'app-city-distance',
@@ -23,22 +26,9 @@ export class CityDistanceComponent implements OnInit, AfterViewInit {
 
   recordDetails: ViewMapDetails = {} as ViewMapDetails;
 
-  constructor(private layout: LayoutService, public gmapdialog: MatDialog) { }
+  constructor(private layout: LayoutService, public gmapdialog: MatDialog, private messageSerivce: MessageService, private confirmDialog: ConfirmationService, private spinner: NgxSpinnerService) { }
 
-  ngOnInit(): void {
-    let startTime = new Date().getTime()
-    let i = 0;
-    // for (let i = 0; i < 5; i++) {
-      let iterval = setInterval(() => {
-        console.log(iterval)
-        if(++i ==  5){
-          clearInterval(iterval);
-        }else{
-          console.log('Index: '+i);
-        }
-      }, 1000);
-    // }
-  }
+  ngOnInit(): void { }
 
 
   public loadPage() {
@@ -54,7 +44,10 @@ export class CityDistanceComponent implements OnInit, AfterViewInit {
       distance: row.distance,
       duration: row.duration,
       travelMode: row.travelMode,
-      settings: row.settings
+      settings: row.settings,
+      sourceLatLng: '',
+      destinationLatLng: '',
+      editmode: true
     }
 
     this.openDialog(this.recordDetails);
@@ -75,10 +68,10 @@ export class CityDistanceComponent implements OnInit, AfterViewInit {
 
   submitRecords() {
 
+    this.spinner.show();
     let citydistance: postReqTemp[] = [];
     if (this.details.data.length > 0) {
       this.details.data.forEach((value) => {
-
         citydistance.push({
           source: value.source,
           destination: value.destination,
@@ -86,17 +79,66 @@ export class CityDistanceComponent implements OnInit, AfterViewInit {
           duration: value.duration,
           travelMode: value.travelMode,
           geometricDetails: [value.sourceAddress, value.destinationAddress],
-          autoCitySettings: value.settings,
+          autoCitySettings: {
+            picker: (value.settings.picker.length > 1) ? new Date(value.settings.picker).toISOString() : '',
+            avoidToll: value.settings.avoidToll,
+            avoidHighways: value.settings.avoidHighways,
+            combinedMode: value.settings.combinedMode,
+            waypoints: value.settings.waypoints,
+            waylocations: value.settings.waypoints.length > 0 ? this.getWaypoints(value.settings.waypoints) : [],
+          },
           destinationActualAddress: value.destinationActualAddress,
           orginActualAddress: value.orginActualAddress,
           positionId: value.positionId
         })
       });
+
+      console.log(citydistance);
+      if (citydistance.length > 0)
+        this.confirmationPopup(citydistance, 'Confirmation', 'Are sure want to be save Locaiton Details');
     }
+  }
+  getWaypoints(value: any): string[] {
+    let waypoints: string[] = value.map((e:any)=>{return e.location})
+    return waypoints;
+  }
+
+  confirmationPopup(citydistance: postReqTemp[], title: string, msg: string) {
+    this.spinner.hide();
+    this.confirmDialog.confirm({
+      message: msg,
+      header: title,
+      icon: 'pi pi-exclamation-triangle',
+      accept: () => {
+        this.spinner.show();
+        this.saveLocationDetails(citydistance);
+      },
+      reject: (type: any) => {
+        console.log(type)
+        switch (type) {
+          case ConfirmEventType.REJECT:
+            this.messageSerivce.add({ severity: 'warn', summary: 'Cancelled', detail: 'You have cancelled' });
+            break;
+        }
+      }
+    });
+  }
+
+  saveLocationDetails(citydistance: postReqTemp[]) {
+    this.layout.saveTravelDetails(citydistance).subscribe((data) => {
+      if (data.length > 0) {
+        console.log("Save TravelDetails: " + JSON.stringify(data));
+        this.messageSerivce.add({ severity: 'success', summary: 'Saved', detail: 'Successfully Stored', life: 5000, closable: true });
+        this.clearTable();
+        this.spinner.hide();
+      }
+    });
   }
 
   clearTable() {
-
+    this.details.data = [];
+    this.layout.travelDetails = [];
+    sessionStorage.removeItem('travelDetails');
   }
 
   ngAfterViewInit(): void {
