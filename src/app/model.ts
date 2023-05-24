@@ -12,8 +12,8 @@ export interface DistanceCalcRequest {
 }
 
 export interface DirectionRequest {
-    origin: string,
-    destination: string,
+    origin: string | google.maps.LatLng,
+    destination: string | google.maps.LatLng,
     travelMode: string,
     unitSystem: 0,
     waypoints: google.maps.DirectionsWaypoint[],
@@ -28,6 +28,7 @@ export interface DialogSetting {
     avoidHighways: boolean,
     combinedMode: boolean,
     waypoints: google.maps.DirectionsWaypoint[],
+    waylocations: string[]
 }
 
 
@@ -65,21 +66,27 @@ export interface ViewMapDetails {
     distance: string,
     duration: string,
     travelMode: string,
-    settings: DialogSetting;
+    settings: DialogSetting,
+    sourceLatLng: string,
+    destinationLatLng: string,
+    editmode: boolean
 }
 
 export interface ViewCityDetails {
 
     positionId: number,
+    cityDistanceId: number,
     sourceCity: string,
     destinationCity: string,
-    sourceChineseName: string,
-    destinationChineseName: string,
-    manualdistance: string,
-    systemdistance: string,
-    systemduration: string,
-    travelMode: string,
-
+    sourceId: string,
+    destinationId: string,
+    distance: string,
+    autoConfig: string,
+    autoupdate: boolean,
+    nextUpdateDate: Date | string,
+    updateProcess: string,
+    sourceLatLng:string,
+    destinationLatLng: string
 }
 
 export interface postReqTemp {
@@ -95,14 +102,60 @@ export interface postReqTemp {
     positionId: number
 }
 
+export interface VdsCityDistanceTemp {
+
+    cityDistId: number,
+    systemDistance: string,
+    autoConfig: string,
+    nextUpdateDate: Date | string,
+    updateProcess: string,
+    vdsCityGeolocations: sourDistDetails[],
+    destinationActualAddress: string,
+    orginActualAddress: string,
+}
+
 export interface sourDistDetails {
-        latitude: string,
-        longtitude: string,
-        locationType: string,
-        formattedAddress: string,
-        country: string,
-        province: string,
-        locality: string,
-        addrType: string        
+    latitude: string,
+    longtitude: string,
+    locationType: string,
+    formattedAddress: string,
+    country: string,
+    province: string,
+    locality: string,
+    addrType: string,
+    sourceChinese:string,
+    destinationChinese:string
+}
+
+export interface GeoLocationRes {
+
+    source: string,
+    destination: string,
+    distance: string,
+    duration: string,
+    travelMode: string,
+    geometricDetails: sourDistDetails[],
+    autoCitySettings: DialogSetting
+    destinationActualAddress: string,
+    orginActualAddress: string,
+    positionId: number
+}
+
+export interface AutoVdsCityDetails{
+
+    cityDistanceId: string,
+    sourceId: string,
+    destinationId: string,
+    sourceCity: string,
+    destinationCity: string,
+    sourceChinese: string,
+    destinationChinese: string,
+    sourceLatLng: string
+    destinationLatLng: string,
+    isCompound: string,
+    nextUpdateDate: Date | string,
+    autoConfig: string,
+    updateProcess: string,
+    distance: string
 }
 

@@ -77,7 +77,36 @@ export class AppService {
       );
   }
 
+  putMapping(requestUrl: string, formData: any): Observable<any> {
+    return this.http.put(env.reqUrl + requestUrl, formData)
+      .pipe(
+        tap(
+          success => console.log('success'),
+          error => {
+            console.log("Error -> ", this.http.get('status'));
+            if (error instanceof HttpErrorResponse && error.status === 403) {
+              console.log(`Error Status: ${error.status} ${error.statusText}`);
+            }
+          }
+        )
+      );
+  }
 
+  getOutsideResource(requestUrl: string): Observable<any> {
+    return this.http.get(requestUrl, {
+      headers: new HttpHeaders()
+    }).pipe(
+      tap(
+        success => console.log('success'),
+        error => {
+          console.log("Error -> ", this.http.get('status'));
+          if (error instanceof HttpErrorResponse && error.status === 403) {
+            console.log(`Error Status: ${error.status} ${error.statusText}`);
+          }
+        }
+      )
+    );
+  }
 
 
   login(formData: any) {
@@ -89,7 +118,8 @@ export class AppService {
     this.OAuth.logOut();
     this.userLoggerIn$.next(false);
     sessionStorage.removeItem('user_info');
-    sessionStorage.removeItem('insertedItems');
+    sessionStorage.removeItem('travelDetails');
+    sessionStorage.removeItem('vdscitydetails');
     this.router.navigate(['']);
   }
 
