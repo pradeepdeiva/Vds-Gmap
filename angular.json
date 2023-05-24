@@ -35,6 +35,7 @@
             "assets": [
               "src/favicon.ico",
               "src/assets",
+              "src/app/layout/assets/image",
               "src/manifest.webmanifest"
             ],
             "styles": [

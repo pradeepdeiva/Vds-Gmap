@@ -13,20 +13,28 @@
     <mat-sidenav-content>
         <div class="header sticky-top py-2">
             <div class="row" style="flex-wrap: nowrap;">
-                <!-- <div class="col-sm-1 col-md-1 col-lg-1 pl-4 arg1">
-                    <button type="button" pButton class="menu-button" icon="pi pi-bars"
-                        (click)="sidenav.open()"></button>
-                </div> -->
+                 <div class="col-sm-1 col-md-1 col-lg-1 pl-4 arg1">
+                    <!-- <button type="button" pButton class="menu-button" icon="pi pi-bars"
+                        (click)="sidenav.open()"></button>-->
+                        <img src="../../../assets/vdsliteLogo.png" alt="image">
+                </div> 
                 <div class="col-sm-3 col-md-3 col-lg-3 heading-name arg2">
                         <p-tabMenu [model]="items" [activeItem]="activeItem" (activeItemChange)="OnActiveItemChange($event)"></p-tabMenu>
                 </div>
                 <div class="col-sm-4 col-md-3 col-lg-3 pr-1 p-text-white arg4">
-                    <div class="name" style="font-weight: bold;">Username</div>
+                    <!-- <div class="name" style="font-weight: bold;">Username</div> -->
                     <button mat-icon-button [matMenuTriggerFor]="usermenu">
-                        <mat-icon class="icon">account_circle</mat-icon>
+                        <mat-icon style="user-select: none; background-repeat: no-repeat;
+                        display: contents;
+                        fill: currentColor;
+                        height: 45px;
+                        width: 73px;
+                        overflow: hidden;
+                        text-align: center;
+                        font-size: 45px;">account_circle</mat-icon>
                     </button>
                     <mat-menu #usermenu yPosition="below">
-                        <button mat-menu-item (click)="logout()">
+                        <button mat-menu-item (click)="logout()" class="mat-btn">
                             <mat-icon>logout</mat-icon>
                             <span>Logout</span>
                         </button>

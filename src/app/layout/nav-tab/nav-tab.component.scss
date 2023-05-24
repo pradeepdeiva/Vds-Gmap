@@ -45,4 +45,28 @@
 
 .arg4 {
   max-width: fit-content;
+  display: contents;
+  text-align: center;
 }
+
+.mat-mdc-icon-button.mat-mdc-button-base {
+  padding: 1px;
+  width: 98px;
+  height: 48px;
+  margin-top: 15px;
+}
+
+.maticon {
+  user-select: none;
+  background-repeat: no-repeat;
+  display: contents;
+  fill: currentColor;
+  height: 45px;
+  width: 73px;
+  overflow: hidden;
+  text-align: center;
+}
+
+// .material-icons {
+//   font-size: 45px;
+// }
