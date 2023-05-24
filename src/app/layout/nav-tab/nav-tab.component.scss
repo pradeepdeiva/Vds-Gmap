@@ -1,45 +1,48 @@
 .nav-container {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-  }
-  .menu-button {
-    background: #e7e9eb;
-    color: #000000;
-    border: none;
-  }
-  .menu-button:enabled:hover,
-  .menu-button:enabled:active {
-    background: #e7e9eb;
-    color: #000000;
-    border: none;
-  }
-  .mat-drawer-content{
-    overflow-x: inherit;
-  }
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
 
-  .header{
-    background-color: #3f51b5;
-  }
+.menu-button {
+  background: #e7e9eb;
+  color: #000000;
+  border: none;
+}
 
-  .heading-name{
-    display: block;
-    margin: auto 0;
-    width: fit-content;
-  }
+.menu-button:enabled:hover,
+.menu-button:enabled:active {
+  background: #e7e9eb;
+  color: #000000;
+  border: none;
+}
 
-  .arg1{
-    display: inline-block;
-    margin: auto 0;
-    width: fit-content;
-  }
+.mat-drawer-content {
+  overflow-x: inherit;
+}
 
-  .arg2{
-    margin: auto 50px;
-  }
+.header {
+  background-color: #3f51b5;
+}
 
-  .arg4{
-    max-width: fit-content;
-  }
+.heading-name {
+  display: block;
+  margin: auto 0;
+  width: fit-content;
+}
+
+.arg1 {
+  display: inline-block;
+  margin: auto 0;
+  width: fit-content;
+}
+
+.arg2 {
+  margin: auto 50px;
+}
+
+.arg4 {
+  max-width: fit-content;
+}

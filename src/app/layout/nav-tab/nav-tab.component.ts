@@ -12,16 +12,16 @@ export class NavTabComponent {
   items: { label: string, icon: string }[] = []
 
 
-  activeItem: { label: string, icon: string } = {} as { label: string, icon: string };
+  activeItem: any = {} as { label: string, icon: string };
 
   constructor(private appService: AppService,private router: Router){}
 
   ngOnInit() {
     this.items = [
       { label: 'Home', icon: 'pi pi-fw pi-home' },
-      { label: 'SingeWay', icon: 'pi pi-code' },
-      { label: 'CombinedWay', icon: 'pi pi-list' },
+      { label: 'Location Details', icon: 'pi pi-list' },
       { label: 'VDS Cities', icon: 'pi pi-window-minimize' },
+      { label: 'Auto Update Cities', icon: 'pi pi-sitemap' },
     ];
 
     this.activeItem = this.items[0];
@@ -32,12 +32,12 @@ export class NavTabComponent {
     console.log("Triggered=> "+JSON.stringify(event.label)+" ==> "+event.label)
     if(event.label === 'Home'){
       this.router.navigate(['/home']);
-    }else if(event.label === 'SingeWay') {
-      this.router.navigate(['/singleway']);
-    }else if(event.label === 'CombinedWay'){
-      this.router.navigate(['/combinedway']);
+    }else if(event.label === 'Location Details') {
+      this.router.navigate(['/location']);
     }else if(event.label === 'VDS Cities'){
       this.router.navigate(['/vdscities']);
+    }else if(event.label === 'Auto Update Cities'){
+      this.router.navigate(['/autocities']);
     }
   }
 

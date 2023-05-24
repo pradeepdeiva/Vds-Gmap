@@ -1,6 +1,7 @@
 
-<mat-sidenav-container autosize class="nav-container" (backdropClick)="sidenav.close()">
-    <mat-sidenav #sidenav (keydown.escape)="sidenav.close()">
+<mat-sidenav-container autosize class="nav-container" >
+    <!-- (backdropClick)="sidenav.close()" -->
+   <!-- <mat-sidenav #sidenav (keydown.escape)="sidenav.close()">
         <nav class="nav">
             <ul class="navbar-nav mx-3 mt-3">
                 <li class="nav-item">
@@ -8,14 +9,14 @@
                 </li>
             </ul>
         </nav>
-    </mat-sidenav>
+    </mat-sidenav> -->
     <mat-sidenav-content>
         <div class="header sticky-top py-2">
             <div class="row" style="flex-wrap: nowrap;">
-                <div class="col-sm-1 col-md-1 col-lg-1 pl-4 arg1">
+                <!-- <div class="col-sm-1 col-md-1 col-lg-1 pl-4 arg1">
                     <button type="button" pButton class="menu-button" icon="pi pi-bars"
                         (click)="sidenav.open()"></button>
-                </div>
+                </div> -->
                 <div class="col-sm-3 col-md-3 col-lg-3 heading-name arg2">
                         <p-tabMenu [model]="items" [activeItem]="activeItem" (activeItemChange)="OnActiveItemChange($event)"></p-tabMenu>
                 </div>
@@ -38,3 +39,6 @@
         </main>
     </mat-sidenav-content>
 </mat-sidenav-container>
+
+<p-toast [style]="{ top: '100px',right: '20px' }"></p-toast>
+<p-confirmDialog [style]="{width: '50vw'}"></p-confirmDialog>
