@@ -57,6 +57,8 @@ export class ViewGmapComponent {
 
   editdestination: string = '';
 
+  editOption: boolean = true;
+
   requestTemplate: DirectionRequest = {
     origin: '',
     destination: '',
@@ -78,8 +80,8 @@ export class ViewGmapComponent {
     console.log(data)
 
     this.requestTemplate = {
-      origin: data.source,
-      destination: data.destination,
+      origin: data.sourceLatLng === '' ? data.source : this.getLatLng(data.sourceLatLng),
+      destination: data.destinationLatLng === '' ? data.destination : this.getLatLng(data.destinationLatLng),
       travelMode: data.travelMode,
       unitSystem: 0,
       waypoints: data.settings.waypoints,
@@ -93,7 +95,13 @@ export class ViewGmapComponent {
     this.editsource = data.source;
     this.editdestination = data.destination;
 
+    this.editOption = data.editmode
+
     this.callRequest(this.requestTemplate, this.data.settings.combinedMode)
+  }
+  getLatLng(latLng: string): string | google.maps.LatLng {
+    
+    return new google.maps.LatLng(Number(latLng.split(',')[0]), Number(latLng.split(',')[1]));
   }
 
   addMarker(event: google.maps.MapMouseEvent) {
@@ -145,18 +153,22 @@ export class ViewGmapComponent {
               avoidToll: this.data.settings.avoidToll,
               avoidHighways: this.data.settings.avoidHighways,
               combinedMode: this.data.settings.combinedMode,
-              waypoints: this.data.settings.waypoints
-            }
+              waypoints: this.data.settings.waypoints,
+              waylocations: []
+            },
+            sourceLatLng: '',
+            destinationLatLng: '',
+            editmode: this.data.editmode
           }
         }
 
       })
-    }else {
+    } else {
       this.getCombinedModeDirection(request);
     }
   }
 
-  getCombinedModeDirection(directionReq: any){
+  getCombinedModeDirection(directionReq: any) {
 
     let result = this.mapservice.route(directionReq);
 
@@ -198,7 +210,7 @@ export class ViewGmapComponent {
         positionId: this.data.positionId,
         source: this.editsource,
         destination: this.editdestination,
-        distance: totaldistance+ ' km',
+        distance: totaldistance + ' km',
         duration: duration_formatted,
         travelMode: this.data.travelMode,
         settings: {
@@ -206,8 +218,12 @@ export class ViewGmapComponent {
           avoidToll: this.data.settings.avoidToll,
           avoidHighways: this.data.settings.avoidHighways,
           combinedMode: this.data.settings.combinedMode,
-          waypoints: this.data.settings.waypoints
-        }
+          waypoints: this.data.settings.waypoints,
+          waylocations: []
+        },
+        sourceLatLng: '',
+        destinationLatLng: '',
+        editmode: this.data.editmode
       }
     })
 
@@ -239,7 +255,7 @@ export class ViewGmapComponent {
     if (this.editmode) {
       this.viewdetails = {} as ViewMapDetails;
       this.callRequest(this.requestTemplate, this.data.settings.combinedMode);
-    }else {
+    } else {
       this.viewdetails = {} as ViewMapDetails;
     }
   }

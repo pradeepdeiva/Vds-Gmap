@@ -35,7 +35,7 @@
                             (click)="showDistance()">Calculate</button>
                         <button mat-flat-button color="primary" *ngIf="!editmode" (click)="changeMode()">Cancel</button>
                         <ng-template #show><button mat-raised-button color="accent"
-                                (click)="changeMode()">Edit</button></ng-template>
+                                (click)="changeMode()" *ngIf="editOption">Edit</button></ng-template>
                     </div>
 
                     <div class="grid row" style="margin-top: 17px;" *ngIf="editmode;else display">
