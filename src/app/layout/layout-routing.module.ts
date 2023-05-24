@@ -6,13 +6,15 @@ import { CityDistanceComponent } from "./city-distance/city-distance.component";
 import { SingleWayDistance } from "./single-way/single-way.component";
 import { VdsCitiesDistance } from "./vds-cities/vds-cities.component";
 import { CombinedWayComponent } from "./combined-way/combined-way.component";
+import { AutoVdsCitiesComponent } from "./auto-vds-cities/auto-vds-cities.component";
+import { LocationDetailsComponent } from "./location-details/location-details.component";
 
 const routes: Routes = [{
     path: '', component: NavTabComponent, children: [
         { path: 'home', component: HomeComponent},
-        { path: 'singleway', component: SingleWayDistance},
-        { path: 'combinedway', component: CombinedWayComponent},
+        { path: 'location', component: LocationDetailsComponent},
         { path: 'vdscities', component: VdsCitiesDistance},
+        { path: 'autocities', component: AutoVdsCitiesComponent},
 
     ]
 }]

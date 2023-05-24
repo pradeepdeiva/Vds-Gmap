@@ -34,7 +34,18 @@ import { SingleWayDistance } from "./single-way/single-way.component";
 import { VdsCitiesDistance } from "./vds-cities/vds-cities.component";
 import { MatRippleModule } from "@angular/material/core"
 import { NgxSpinnerModule } from "ngx-spinner";
- 
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { MessageService } from "primeng/api";
+import { ConfirmationService } from "primeng/api";
+import { ToastModule } from 'primeng/toast';
+import {MessagesModule} from 'primeng/messages';
+import { AutoVdsCitiesComponent } from "./auto-vds-cities/auto-vds-cities.component";
+import { LocationDetailsComponent } from "./location-details/location-details.component";
+
+
+
 
 
 @NgModule({
@@ -45,11 +56,14 @@ import { NgxSpinnerModule } from "ngx-spinner";
         CityDistanceComponent,
         SingleWayDistance,
         ViewGmapComponent,
-        VdsCitiesDistance
+        VdsCitiesDistance,
+        AutoVdsCitiesComponent,
+        LocationDetailsComponent
     ],
     imports: [
         CommonModule,
         MatTableModule,
+        MatPaginatorModule,
         LayoutRoutingModule,
         ReactiveFormsModule,
         FormsModule,
@@ -76,12 +90,17 @@ import { NgxSpinnerModule } from "ngx-spinner";
         CdkListboxModule,
         MatDialogModule,
         GooglePlaceModule,
-        MatPaginatorModule,
+        MatSlideToggleModule,
+        MatButtonToggleModule,
         MatRippleModule,
         GoogleMapsModule,
-        NgxSpinnerModule
+        NgxSpinnerModule,
+        DropdownModule,
+        ConfirmDialogModule,
+        ToastModule,
+        MessagesModule
     ],
-    providers: [LayoutService],
+    providers: [MessageService,ConfirmationService],
     exports: [],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
